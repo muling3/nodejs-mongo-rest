@@ -1,0 +1,58 @@
+{
+    "users":[
+        {
+            "id": 1,
+            "username": "Hopper",
+            "firstname": "Murray",
+            "lastname": "Hopper"
+        },
+        {
+            "id": 2,
+            "username": "RoyF",
+            "firstname": "Roy",
+            "lastname": "Fielding"
+        },
+        {
+            "id": 3,
+            "username": "Gboole",
+            "firstname": "George",
+            "lastname": "Boole"
+        },
+        {
+            "id": 4,
+            "username": "PrinceC",
+            "firstname": "Charles",
+            "lastname": "Second"
+        }
+    ],
+    "posts": [
+        {
+            "user": 4,
+            "title": "Flutter Apprentice",
+            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse quidem itaque rem numquam tenetur nesciunt voluptatibus amet est maxime cupiditate.",
+            "category": "Mobile",
+            "tags": ["Flutter", "Dart"]
+        },
+         {
+            "user": 1,
+            "title": "React Native Apprentice",
+            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse quidem itaque rem numquam tenetur nesciunt voluptatibus amet est maxime cupiditate.",
+            "category": "Mobile",
+            "tags": ["JavaScript", "React"]
+        },
+         {
+            "user": 1,
+            "title": "AngularJS Apprentice",
+            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse quidem itaque rem numquam tenetur nesciunt voluptatibus amet est maxime cupiditate.",
+            "category": "Web",
+            "tags": ["JavaScript", "AngularJS"]
+        },
+         {
+            "user": 1,
+            "title": "React Apprentice",
+            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse quidem itaque rem numquam tenetur nesciunt voluptatibus amet est maxime cupiditate.",
+            "category": "Web",
+            "tags": ["JavaScript", "React"]
+        }
+    ]
+}
