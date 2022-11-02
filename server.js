@@ -4,7 +4,9 @@ require("dotenv").config();
 
 const errorHandler = require("./middleware/errorMiddleware");
 const loggerMiddleware = require("./middleware/loggerMiddleware");
-const authMiddleware = require("./middleware/authorisationMidlleware");
+const authMiddleware = require("./middleware/authenticationMidlleware");
+const authorisationMiddleware = require("./middleware/authorizationMiddleware");
+
 const dbConn = require("./config/dbConn");
 
 //db connection
@@ -26,6 +28,7 @@ app.use("/users", require("./routes/userRouter"));
 
 //protecting blogs
 app.use(authMiddleware);
+app.use(authorisationMiddleware);
 app.use("/blogs", require("./routes/blogRouter"));
 
 //errorMiddleware ::Custom

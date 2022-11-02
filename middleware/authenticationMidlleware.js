@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
         return res.status(403).json({ message: "Invalid token", ok: false });
 
       req.username = decoded.username;
-      console.log("Username -> " + req.username);
+      req.roles = decoded.roles;
       next();
     });
   } else {

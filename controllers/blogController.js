@@ -9,7 +9,7 @@ const getBlogs = asyncHandler(async (req, res) => {
 });
 
 //Returns an object of the requested Blog
-//Search by Blogname in query params
+//Search by BlogId in query params
 const getBlog = asyncHandler(async (req, res) => {
   const { id } = req.query;
 
@@ -31,7 +31,7 @@ const getBlog = asyncHandler(async (req, res) => {
 
 // returns the created Blog object
 const createBlog = asyncHandler(async (req, res) => {
-  const { title, body, category, tags } = req.body;
+  const { title, body, category} = req.body;
 
   //return a bad request if all the fields have not been provided
   if (!title && !body && !category) {
@@ -73,6 +73,7 @@ const updateBlog = asyncHandler(async (req, res) => {
 
   console.log(typeof blog.user);
   console.log(typeof user._id);
+
   //ensure that the blog is owned by the user
   if (String(blog.user) !== String(user._id)) {
     res.status(401);
@@ -84,7 +85,7 @@ const updateBlog = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json({ message: `Blog ${blog._id} deleted`, ok: true });
+    .json({ message: `Blog ${blog._id} updated`, ok: true });
 });
 
 // returns the deleted blog id if successful

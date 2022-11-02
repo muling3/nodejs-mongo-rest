@@ -9,6 +9,7 @@ This application connects to a mongodb instance and performs `CRUD` operations o
    - Error middleware
    - Logger middleware
    - Authentication middleware
+   - Authorization middleware
 
 ## Environment variables
 1. PORT
@@ -39,4 +40,3 @@ A user can not edit or delete a blog which does not belong to him.
 
 
 ---
-Authorisation middleware to be implemented soon...# nodejs-mongo-rest

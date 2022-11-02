@@ -50,14 +50,22 @@ const login = asyncHandler(async (req, res) => {
   }
 
   //create an accessToken ::  expires in 2 minutes
-  const accessToken = jwt.sign({ username }, process.env.ACCESS_SECRET, {
-    expiresIn: "60s",
-  });
+  const accessToken = jwt.sign(
+    { username, roles: user.roles },
+    process.env.ACCESS_SECRET,
+    {
+      expiresIn: "600s",
+    }
+  );
 
   //create an accessToken :: expires in 5 minutess
-  const refreshToken = jwt.sign({ username }, process.env.REFRESH_SECRET, {
-    expiresIn: "1d",
-  });
+  const refreshToken = jwt.sign(
+    { username, roles: user.roles },
+    process.env.REFRESH_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
 
   //add refreshToken in cookies
   res.cookie("jwt", refreshToken, {
@@ -126,7 +134,6 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 //referesh accessToken
-// returns the reguistered user
 const refresh = asyncHandler(async (req, res) => {
   //get cookies from the request object
   const cookies = req.cookies;
@@ -160,7 +167,6 @@ const refresh = asyncHandler(async (req, res) => {
 });
 
 //logout to clear cookies
-// returns the reguistered user
 const logout = asyncHandler(async (req, res) => {
   //get cookies from the request object
   const cookies = req.cookies;
@@ -192,8 +198,16 @@ const logout = asyncHandler(async (req, res) => {
 
 // returns the user with the new updated password
 const changePass = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+
+  //return a bad request if all the fields  have not been provided
+  if (!username && !password) {
+    res.status(400);
+    throw new Error("Please ensure all fields");
+  }
+
   //get the user from the database
-  const user = await User.findOne({ username: req.body.username });
+  const user = await User.findOne({ username });
 
   //ensure that the user is found
   if (!user) {
@@ -201,18 +215,12 @@ const changePass = asyncHandler(async (req, res) => {
     throw new Error("Invalid username");
   }
 
-  //ensure the user is equal to user from the middleware
-  if (user.username != req.username) {
-    res.status(401);
-    throw new Error("Not Authorised");
-  }
-
   //change the password
   const userUpdatedPass = await User.findOneAndUpdate(
     {
-      username: req.body.username,
+      username,
     },
-    { $set: { password: req.body.password } },
+    { $set: { password } },
     { new: true }
   );
 
@@ -223,7 +231,7 @@ const changePass = asyncHandler(async (req, res) => {
 const deleteUser = asyncHandler(async (req, res) => {
   if (!req.query.username) {
     res.status(403);
-    throw new Error("No Aceestoken");
+    throw new Error("No username provided");
   }
 
   //fetch the user with such username
@@ -235,14 +243,67 @@ const deleteUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid username");
   }
 
-  //ensure the user is equal to user from the middleware
-  if (user.username != req.username) {
-    res.status(401);
-    throw new Error("Not Authorised");
+  const deletedUser = await User.deleteOne({ username: user.username });
+  return res.status(200).json({ deletedUser: `${user.username}`, ok: true });
+});
+
+// returns the user object which has been added a new role
+const addUserRole = asyncHandler(async (req, res) => {
+  if (!req.query.username || !req.query.role) {
+    res.status(403);
+    throw new Error("Please provide username and role");
   }
 
-  const deletedUser = await User.deleteOne({ username: req.username });
-  return res.status(200).json({ deletedUser: `${req.username}`, ok: true });
+  //fetch the user with such username
+  const user = await User.findOne({ username: req.query.username });
+
+  //confirm if user exxists else throw an error
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid username");
+  }
+
+  //add role to user
+  const userUpdatedRole = await User.findOneAndUpdate(
+    {
+      username: req.query.username,
+    },
+    { $set: { roles: [...user.roles, req.query.role] } },
+    { new: true }
+  );
+
+  return res.status(201).json({ userUpdatedRole, ok: true });
+});
+
+// returns the user object which has been stripped a role
+const removeUserRole = asyncHandler(async (req, res) => {
+  if (!req.query.username || !req.query.role) {
+    res.status(403);
+    throw new Error("Please provide username and role");
+  }
+
+  //fetch the user with such username
+  const user = await User.findOne({ username: req.query.username });
+
+  //confirm if user exxists else throw an error
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid username");
+  }
+
+  //create new user roles
+  let roles = user.roles.filter((role) => role != req.query.role);
+
+  //add role to user
+  const userUpdatedRole = await User.findOneAndUpdate(
+    {
+      username: req.query.username,
+    },
+    { $set: { roles } },
+    { new: true }
+  );
+
+  return res.status(201).json({ userUpdatedRole, ok: true });
 });
 
 module.exports = {
@@ -254,4 +315,6 @@ module.exports = {
   refresh,
   logout,
   login,
+  addUserRole,
+  removeUserRole,
 };
