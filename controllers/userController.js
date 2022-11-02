@@ -49,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
     throw new Error("Invalid login details");
   }
 
-  //create an accessToken ::  expires in 2 minutes
+  //create an accessToken ::  expires in 10 minutes
   const accessToken = jwt.sign(
     { username, roles: user.roles },
     process.env.ACCESS_SECRET,
@@ -58,18 +58,15 @@ const login = asyncHandler(async (req, res) => {
     }
   );
 
-  //create an accessToken :: expires in 5 minutess
-  const refreshToken = jwt.sign(
-    { username, roles: user.roles },
-    process.env.REFRESH_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
+  //create an refreshToken :: expires in 1 day
+  const refreshToken = jwt.sign({ username }, process.env.REFRESH_SECRET, {
+    expiresIn: "1d",
+  });
 
   //add refreshToken in cookies
   res.cookie("jwt", refreshToken, {
     httpOnly: true,
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
   });
 
@@ -111,26 +108,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //TODO: Encrypt password
 
-  //create an accessToken ::  expires in 2 minutes
-  const accessToken = jwt.sign({ username }, process.env.ACCESS_SECRET, {
-    expiresIn: "60s",
-  });
-
-  //create an accessToken :: expires in 5 minutess
-  const refreshToken = jwt.sign({ username }, process.env.REFRESH_SECRET, {
-    expiresIn: "1d",
-  });
-
-  //add accessToken in cookies
-  res.cookie("jwt", refreshToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
   //proceed with saving the user in the db
-  const newUser = await User.create({ ...req.body, refreshToken });
+  const newUser = await User.create(req.body);
 
-  return res.status(201).json({ newUser, accessToken, ok: true });
+  return res.status(201).json({ newUser, ok: true });
 });
 
 //referesh accessToken
@@ -152,13 +133,13 @@ const refresh = asyncHandler(async (req, res) => {
     if (err) {
       return res.status(403).json({ message: "Invalid token", ok: false });
     }
-
-    //create another accessToken ::  expires in 2 minutes
+    
+    //create another accessToken ::  expires in 10 minutes
     const accessToken = jwt.sign(
-      { username: decoded.username },
+      { username: decoded.username, roles: user.roles },
       process.env.ACCESS_SECRET,
       {
-        expiresIn: "60s",
+        expiresIn: "600s",
       }
     );
 
@@ -190,7 +171,7 @@ const logout = asyncHandler(async (req, res) => {
   //clear cookies and delete the refresh token from the databse
   res.clearCookie("jwt", {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'none',
   });
 
   res.status(200).json({ message: "successful" });

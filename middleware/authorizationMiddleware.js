@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
       req.query.role != null)
   ) {
     //require ROLE_SUPER_ADMIN
-    console.log("Username: " + req.user + "User roles => " + rolesArray);
+    console.log("Username: " + req.username + " User roles => " + rolesArray);
 
     if (
       rolesArray.find((role) => String(role) == "ROLE_SUPER_ADMIN") == undefined
@@ -30,7 +30,7 @@ module.exports = (req, res, next) => {
     }
   } else if (req.method == "PATCH") {
     //require ROLE_ADMIN
-    console.log("Username: " + req.user + "User roles => " + rolesArray);
+    console.log("Username: " + req.username + " User roles => " + rolesArray);
 
     if (rolesArray.find((role) => String(role) == "ROLE_ADMIN") == undefined) {
       return res.status(401).json({ message: "Not Authorized", ok: false });
@@ -46,7 +46,7 @@ module.exports = (req, res, next) => {
     console.log("No roles required");
   } else {
     //require ROLE_USER
-    console.log("Username: " + req.user + "User roles => " + rolesArray);
+    console.log("Username: " + req.username + " User roles => " + rolesArray);
 
     if (rolesArray.find((role) => String(role) == "ROLE_USER") == undefined) {
       return res.status(401).json({ message: "Not Authorized", ok: false });
